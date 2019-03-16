@@ -10,9 +10,15 @@
     "dependencies": {
         "lodash": "^4.17.11",
         "mongodb": "^3.1.13",
-        "ramda": "^0.26.1",
-        "@jadesrochers/checksettings": "^0.1.0",
-        "@jadesrochers/fpstreamline": "^0.1.0"
+        "ramda": "^0.26.1"
+    },
+    "dependenciesComments": {
+        "toadd1": "@jadesrochers/checksettings: ^0.1.0",
+        "toadd2": "@jadesrochers/fpstreamline: ^0.1.0"
+    },
+    "repository":{
+        "type":"git",
+	"url": "https://github.com/jadesrochers/mongosimple.git"
     },
     "scripts": {
         "test": "jest"
