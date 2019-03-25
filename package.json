@@ -1,9 +1,12 @@
 {
     "name": "@jadesrochers/mongosimple",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "license": "Apache-2.0",
     "author": "Jared Desrochers",
-    "repository": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jadesrochers/mongosimple.git"
+    },
     "description": "Make interactions with MongoClient simple",
     "main": "mongotools.js",
     "keywords": [],
@@ -11,12 +14,8 @@
         "lodash": "^4.17.11",
         "mongodb": "^3.1.13",
         "ramda": "^0.26.1",
-	"@jadesrochers/checksettings": "^0.1.0",
-	"@jadesrochers/fpstreamline": "^0.1.0"
-    },
-    "repository":{
-        "type":"git",
-	"url": "https://github.com/jadesrochers/mongosimple.git"
+        "@jadesrochers/checksettings": "^0.1.0",
+        "@jadesrochers/fpstreamline": "^0.1.0"
     },
     "scripts": {
         "test": "jest"
