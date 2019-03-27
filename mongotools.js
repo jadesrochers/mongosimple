@@ -1,12 +1,8 @@
-const MongoClient = require('mongodb').MongoClient
 const F = require('lodash/fp')
-const R = require('ramda')
-const fps = require('@jadesrochers/fpstreamline');
 const checkset = require('@jadesrochers/checksettings')
 const commrun = require('./src/commandrun')
 const commcreate = require('./src/commandcreate')
 const db = require('./src/dbhandlers')
-
 
 const settings_required = ["urldb","database"]
 const mongoMaker = async function(inSettings){
@@ -27,7 +23,6 @@ const mongoMaker = async function(inSettings){
     {dbclient: settings.dbclient},
   )
 }
-
 
 exports.mongoMaker = mongoMaker
 exports.findCommand = commcreate.findCommand
