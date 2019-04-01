@@ -1,4 +1,4 @@
-const F = require('lodash/fp')
+const R = require('ramda')
 const checkset = require('@jadesrochers/checksettings')
 const commrun = require('./src/commandrun')
 const commcreate = require('./src/commandcreate')
@@ -7,7 +7,7 @@ const db = require('./src/dbhandlers')
 const settings_required = ["urldb","database"]
 const mongoMaker = async function(inSettings){
   checkset.checkSettings(settings_required)(inSettings);
-  var settings = F.cloneDeep(inSettings)
+  var settings = R.clone(inSettings)
   settings.mgclient = await db.mongoClient(settings.urldb);
   settings.dbclient = await db.dbClient(settings);
   const exeCommand = db.dbCommand(settings.dbclient);

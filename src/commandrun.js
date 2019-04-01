@@ -1,49 +1,49 @@
-const F = require('lodash/fp')
 const R = require('ramda')
 const fps = require('@jadesrochers/fpstreamline');
 const cc = require('./commandcreate');
 
 const hasData = R.pipe(
-  F.get('cursor.firstBatch'),
+  R.path(['cursor','firstBatch']),
   R.length,
-  F.lt(0),
+  R.lt(0),
 )
 
-const createIndex = F.curry((exeCommand,collection,index) => 
+const createIndex = R.curry((exeCommand,collection,index) => 
   fps.pipeAsync(
     cc.indexCommand(collection),
     exeCommand,
   )(index)
 )
 
-const dropIndex = F.curry((exeCommand,collection,name) => 
+const dropIndex = R.curry((exeCommand,collection,name) => 
   fps.pipeAsync(
     cc.dropIndexCommand(collection),
     exeCommand,
   )(name)
 )
 
-const checkExists = F.curry((exeCommand,collection,documents) => 
+const checkExists = R.curry((exeCommand,collection,documents) => 
   fps.pipeAsync(
-    cc.findCommand(collection),
+    cc.findCommand(collection, documents),
     exeCommand,
     hasData,
-  )(documents)
+  )()
 )
 
-const insertIntoDb = F.curry((exeCommand,collection,documents) => 
+const insertIntoDb = R.curry((exeCommand,collection,documents) => 
   fps.pipeAsync(
     cc.insertCommand(collection),
     exeCommand,
   )(documents)
 )
 
-const findFromDb = F.curry((exeCommand,collection,documents) => {
+const findFromDb = R.curry((exeCommand,collection,documents,project={}) => {
   return fps.pipeAsync(
-    cc.findCommand(collection),
+    /* cc.findCommand(collection, documents, project), */
+    cc.findCommand(collection, documents),
     exeCommand,
-    F.get('cursor.firstBatch'),
-  )(documents)
+    R.path(['cursor','firstBatch']),
+  )(project)
 })
 
 exports.hasData = hasData

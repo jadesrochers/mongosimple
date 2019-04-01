@@ -39,7 +39,8 @@ describe('Inserts, Index, Find', () => {
   });
 
   beforeAll(async () => {
-    dbconn.insertIntoDb('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    await dbconn.insertIntoDb('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    await dbconn.insertIntoDb('test')({_id: 3, d: 'singleinsert'})
     var aIndex = {
       key: {_id: 1, 'a':1 },
       name: 'afind'
@@ -52,8 +53,11 @@ describe('Inserts, Index, Find', () => {
   })
 
   test('Integration; dbCommand, insertCommand/insertIntoDb and findCommand/findFromDb', async () => {
-    var data = await dbconn.findFromDb('test')({a: 1})
+    var data = await dbconn.findFromDb('test', {a: 1})
     expect(data).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    // The input ({b: 1}) is project arg to get only that member in output.
+    var dataproject = await dbconn.findFromDb('test')({a: 1}, {b: 1})
+    expect(dataproject).toEqual([{_id:1, b: 2},{_id: 2, b: 4}])
   })
 
   test('Integration; insertCommand/insertIntoDb and checkExists/findCommand/hasData', async () => {

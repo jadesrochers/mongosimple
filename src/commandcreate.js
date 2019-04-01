@@ -1,38 +1,39 @@
-const F = require('lodash/fp')
 const R = require('ramda')
+const fps = require('@jadesrochers/fpstreamline')
 
 // Create find&filter command to look for something in the db
-const findCommand = collection => filter => {
+const findCommand = R.curry((collection,filter) => (project={}) => {
   return R.pipe(
-    F.set('find')(collection),
-    F.set('filter')(filter),
+    R.assoc('find')(collection),
+    R.assoc('filter')(filter),
+    R.assoc('projection')(project),
   )({})
-}
+})
 
 // Create a command to insert data
-const insertCommand = collection => documents => {
-  documents = F.castArray(documents)
+const insertCommand = R.curry((collection,documents) => {
+  documents = fps.toArray(documents)
   return R.pipe(
-    F.set('insert')(collection),
-    F.set('documents')(documents),
+    R.assoc('insert')(collection),
+    R.assoc('documents')(documents),
   )({})
-}
+})
 
-const indexCommand = collection => indices => {
-  indicesarr = F.castArray(indices)
+const indexCommand = R.curry((collection,indices) => {
+  indicesarr = fps.toArray(indices)
   return R.pipe(
-    F.set('createIndexes')(collection),
-    F.set('indexes')(indicesarr),
+    R.assoc('createIndexes')(collection),
+    R.assoc('indexes')(indicesarr),
   )({})
-}
+})
 
 // Seems only one index can be dropped at a time. Or all.
-const dropIndexCommand = collection => name => {
+const dropIndexCommand = R.curry((collection,name) => {
   return R.pipe(
-    F.set('dropIndexes')(collection),
-    F.set('index')(name),
+    R.assoc('dropIndexes')(collection),
+    R.assoc('index')(name),
   )({})
-}
+})
 
 exports.findCommand = findCommand
 exports.insertCommand = insertCommand
