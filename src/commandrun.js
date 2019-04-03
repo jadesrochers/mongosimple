@@ -37,13 +37,12 @@ const insertIntoDb = R.curry((exeCommand,collection,documents) =>
   )(documents)
 )
 
-const findFromDb = R.curry((exeCommand,collection,documents,project={}) => {
+const findFromDb = R.curry((exeCommand,collection,filter,optional={}) => {
   return fps.pipeAsync(
-    /* cc.findCommand(collection, documents, project), */
-    cc.findCommand(collection, documents),
+    cc.findCommand(collection, filter),
     exeCommand,
     R.path(['cursor','firstBatch']),
-  )(project)
+  )(optional)
 })
 
 exports.hasData = hasData

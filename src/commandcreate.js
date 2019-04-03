@@ -1,12 +1,22 @@
 const R = require('ramda')
 const fps = require('@jadesrochers/fpstreamline')
 
+var findOptional = ['projection','limit','sort','skip','hint','explain',
+'timeout','tailable','min','max','raw','collation','partial',
+'batchSize','comment','readPreference','maxtimeMS']
+
+var validOptions = R.curry((possibleOptions,optional) => R.pipe(
+  R.keys,
+  R.intersection(possibleOptions),
+  R.flip(R.pick)(optional)
+)(optional))
+
 // Create find&filter command to look for something in the db
-const findCommand = R.curry((collection,filter) => (project={}) => {
+const findCommand = R.curry((collection,filter) => (optional={}) => {
   return R.pipe(
     R.assoc('find')(collection),
     R.assoc('filter')(filter),
-    R.assoc('projection')(project),
+    R.mergeLeft(validOptions(findOptional,optional)),
   )({})
 })
 

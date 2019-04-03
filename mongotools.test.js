@@ -56,8 +56,21 @@ describe('Inserts, Index, Find', () => {
     var data = await dbconn.findFromDb('test', {a: 1})
     expect(data).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
     // The input ({b: 1}) is project arg to get only that member in output.
-    var dataproject = await dbconn.findFromDb('test')({a: 1}, {b: 1})
+    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}})
     expect(dataproject).toEqual([{_id:1, b: 2},{_id: 2, b: 4}])
+    // test projection and limit together
+    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}, limit: 1})
+    expect(dataproject).toEqual([{_id:1, b: 2}])
+    // min/max only work with an index; all values in index must be used.
+    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}, limit: 1, min: {_id:1, b:3}})
+    expect(dataproject).toEqual([{_id: 2, b: 4}])
+    // sort in reverse numeric
+    var data = await dbconn.findFromDb('test', {a: 1},{'sort':{b: -1}})
+    expect(data).toEqual([{_id: 2, a: 1, b: 4, c: 11},{_id: 1, a: 1, b: 2, c: 5}])
+    // Skip one result
+    var data = await dbconn.findFromDb('test', {a: 1},{'skip':1})
+    expect(data).toEqual([{_id: 2, a: 1, b: 4, c: 11}])
+
   })
 
   test('Integration; insertCommand/insertIntoDb and checkExists/findCommand/hasData', async () => {
