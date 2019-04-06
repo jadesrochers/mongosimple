@@ -8,6 +8,13 @@ const hasData = R.pipe(
   R.lt(0),
 )
 
+const getDistinct = R.curry((exeCommand,collection,field,query={}) => 
+  fps.pipeAsync(
+    cc.distinctCommand(collection,field),
+    exeCommand,
+  )(query)
+)
+
 const createIndex = R.curry((exeCommand,collection,index) => 
   fps.pipeAsync(
     cc.indexCommand(collection),
@@ -46,8 +53,10 @@ const findFromDb = R.curry((exeCommand,collection,filter,optional={}) => {
 })
 
 exports.hasData = hasData
+exports.getDistinct = getDistinct
 exports.createIndex = createIndex
 exports.dropIndex = dropIndex
 exports.checkExists = checkExists
 exports.insertIntoDb = insertIntoDb
 exports.findFromDb = findFromDb
+

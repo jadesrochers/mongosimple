@@ -29,6 +29,15 @@ const insertCommand = R.curry((collection,documents) => {
   )({})
 })
 
+// Create a command to insert data
+const distinctCommand = R.curry((collection,field,query) => {
+  return R.pipe(
+    R.assoc('distinct')(collection),
+    R.assoc('key')(field),
+    R.assoc('query')(query),
+  )({})
+})
+
 const indexCommand = R.curry((collection,indices) => {
   indicesarr = fps.toArray(indices)
   return R.pipe(
@@ -49,3 +58,5 @@ exports.findCommand = findCommand
 exports.insertCommand = insertCommand
 exports.indexCommand = indexCommand
 exports.dropIndexCommand = dropIndexCommand
+exports.distinctCommand = distinctCommand
+

@@ -14,6 +14,7 @@ const mongoMaker = async function(inSettings){
   return Object.assign(
     {},
     {dbCommand: exeCommand},
+    {getDistinct: commrun.getDistinct(exeCommand)},
     {createIndex: commrun.createIndex(exeCommand)},
     {dropIndex: commrun.dropIndex(exeCommand)},
     {checkExists: commrun.checkExists(exeCommand)},

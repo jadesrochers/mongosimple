@@ -52,6 +52,11 @@ describe('Inserts, Index, Find', () => {
     await dbconn.createIndex('test')([aIndex, bIndex])
   })
 
+  test('Integration; getDistinct/distinctCommand', async () => {
+    var data = await dbconn.getDistinct('test', 'b')
+    expect(data.values).toEqual([2,4])
+  })
+
   test('Integration; dbCommand, insertCommand/insertIntoDb and findCommand/findFromDb', async () => {
     var data = await dbconn.findFromDb('test', {a: 1})
     expect(data).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
