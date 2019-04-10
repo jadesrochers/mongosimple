@@ -1,5 +1,4 @@
 var { MongoMemoryServer } = require('mongodb-memory-server')
-/* const MongoClient = require('mongodb').MongoClient */
 const mongotools = require('./mongotools')
 
 let dbconn, mongoServer;
@@ -26,21 +25,22 @@ describe('Set up and Tear down', () => {
   });
 
   test('Successful creation of client', async () => {
-    expect(dbconn.dbCommand).toBeDefined();
+    expect(dbconn.command).toBeDefined();
     await dbconn.closeConnect()
-    await expect(dbconn.findFromDb('test',{a: 1})).rejects.toThrow(/topology was destroyed/)
+    var rslt = await dbconn.find('test',{a: 1})
+    expect(rslt.toArray()).rejects.toThrow(/Topology was destroyed/)
   })
 
 })
 
-describe('Inserts, Index, Find', () => {
+describe('Inserts, Index, Find, Aggregate', () => {
   beforeAll(async () => {
     await setupMemDb()
   });
 
   beforeAll(async () => {
-    await dbconn.insertIntoDb('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
-    await dbconn.insertIntoDb('test')({_id: 3, d: 'singleinsert'})
+    await dbconn.insertMany('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    await dbconn.insertMany('test')({_id: 3, d: 'singleinsert'})
     var aIndex = {
       key: {_id: 1, 'a':1 },
       name: 'afind'
@@ -49,32 +49,44 @@ describe('Inserts, Index, Find', () => {
       key: {_id: 1, 'b':1 },
       name: 'bfind'
     }
-    await dbconn.createIndex('test')([aIndex, bIndex])
+    await dbconn.createIndexes('test')([aIndex, bIndex])
   })
 
   test('Integration; getDistinct/distinctCommand', async () => {
-    var data = await dbconn.getDistinct('test', 'b')
-    expect(data.values).toEqual([2,4])
+    var data = await dbconn.distinct('test', 'b')
+    var dataarr = await data
+    expect(dataarr).toEqual([2,4])
   })
 
-  test('Integration; dbCommand, insertCommand/insertIntoDb and findCommand/findFromDb', async () => {
-    var data = await dbconn.findFromDb('test', {a: 1})
-    expect(data.cursor.firstBatch).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
-    // The input ({b: 1}) is project arg to get only that member in output.
-    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}})
-    expect(dataproject.cursor.firstBatch).toEqual([{_id:1, b: 2},{_id: 2, b: 4}])
-    // test projection and limit together
-    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}, limit: 1})
-    expect(dataproject.cursor.firstBatch).toEqual([{_id:1, b: 2}])
-    // min/max only work with an index; all values in index must be used.
-    var dataproject = await dbconn.findFromDb('test')({a: 1},{'projection':{b: 1}, limit: 1, min: {_id:1, b:3}})
-    expect(dataproject.cursor.firstBatch).toEqual([{_id: 2, b: 4}])
-    // sort in reverse numeric
-    var data = await dbconn.findFromDb('test', {a: 1},{'sort':{b: -1}})
-    expect(data.cursor.firstBatch).toEqual([{_id: 2, a: 1, b: 4, c: 11},{_id: 1, a: 1, b: 2, c: 5}])
-    // Skip one result
-    var data = await dbconn.findFromDb('test', {a: 1},{'skip':1})
-    expect(data.cursor.firstBatch).toEqual([{_id: 2, a: 1, b: 4, c: 11}])
+  test('Integration; command, insertCommand/insertIntoDb and findCommand/findFromDb', async () => {
+    var cursor = await dbconn.find('test')({a: 1})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+
+    var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id:1, b: 2},{_id: 2, b: 4}])
+
+    var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}, limit: 1})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id:1, b: 2}])
+
+    var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}, limit: 1, min: {_id:1, b:3}})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id:2, b: 4}])
+
+    var cursor = await dbconn.find('test')({a: 1},{'sort':{b: -1}})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11},{_id: 1, a: 1, b: 2, c: 5}])
+
+    var cursor = await dbconn.find('test')({a: 1},{'skip':1})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11}])
+
+    // Aggregate commands made a bit easier
+    var aggcursor = await dbconn.aggregate('test')([{$match: {a: 1}},{$limit:1}, {$project: {b:1}}])
+    var rsltarr = await aggcursor.toArray()
+    expect(rsltarr).toEqual([{_id: 1, b: 2}])
 
   })
 
@@ -86,13 +98,13 @@ describe('Inserts, Index, Find', () => {
     expect(data).toBe(false)
   })
 
-  test('Integration IndexCommand and createIndex, dbCommand', async () => {
+  test('Integration IndexCommand and createIndex, command', async () => {
     var idxs = await dbconn.Db.collection('test').indexes()
     idxs = idxs.map(n => n.name)
     expect(idxs).toEqual(['_id_','afind','bfind'])
   })
 
-  test('Integration dropIndexCommand and dropIndex, dbCommand', async () => {
+  test('Integration dropIndexCommand and dropIndex, command', async () => {
     await dbconn.dropIndex('test')('afind')
     await dbconn.dropIndex('test')('bfind')
     var idxs = await dbconn.Db.collection('test').indexes()

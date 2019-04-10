@@ -1,7 +1,5 @@
 const R = require('ramda')
 const checkset = require('@jadesrochers/checksettings')
-const commrun = require('./src/commandrun')
-const commcreate = require('./src/commandcreate')
 const db = require('./src/dbhandlers')
 const commands = require('./src/commands')
 
@@ -15,21 +13,20 @@ const mongoMaker = async function(inSettings){
   const command = db.command(Db);
   return Object.assign(
     {},
-    {command: command},
-    {getDistinct: commrun.getDistinct(command)},
-    {createIndex: commrun.createIndex(command)},
-    {dropIndex: commrun.dropIndex(command)},
-    {checkExists: commrun.checkExists(command)},
-    {insertIntoDb: commrun.insertIntoDb(command)},
-    {findFromDb: commrun.findFromDb(command)},
+    {checkExists: commands.checkExists(collection)},
     {closeConnect: db.closeConnect(mongoClient)},
+    {find: commands.find(collection) },
+    {findOne: commands.findOne(collection) },
+    {aggregate: commands.aggregate(collection) },
+    {distinct: commands.distinct(collection) },
+    {insertMany: commands.insertMany(collection) },
+    {deleteMany: commands.deleteMany(collection) },
+    {createIndexes: commands.createIndexes(collection) },
+    {dropIndex: commands.dropIndex(collection) },
+    {command: command},
     {Db: Db},
+    {collection: collection},
   )
 }
 
 exports.mongoMaker = mongoMaker
-exports.findCommand = commcreate.findCommand
-exports.insertCommand = commcreate.insertCommand
-exports.indexCommand = commcreate.indexCommand
-exports.dropIndexCommand = commcreate.dropIndexCommand
-exports.hasData = commrun.hasData
