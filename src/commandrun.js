@@ -48,7 +48,6 @@ const findFromDb = R.curry((exeCommand,collection,filter,optional={}) => {
   return fps.pipeAsync(
     cc.findCommand(collection, filter),
     exeCommand,
-    R.path(['cursor','firstBatch']),
   )(optional)
 })
 
