@@ -3,25 +3,27 @@ const checkset = require('@jadesrochers/checksettings')
 const commrun = require('./src/commandrun')
 const commcreate = require('./src/commandcreate')
 const db = require('./src/dbhandlers')
+const commands = require('./src/commands')
 
 const settings_required = ["urldb","database"]
 const mongoMaker = async function(inSettings){
   checkset.checkSettings(settings_required)(inSettings);
   var settings = R.clone(inSettings)
-  settings.mgclient = await db.mongoClient(settings.urldb);
-  settings.dbclient = await db.dbClient(settings);
-  const exeCommand = db.dbCommand(settings.dbclient);
+  var mongoClient = await db.mongoClient(settings.urldb);
+  var Db = await db.Db(mongoClient, settings.database);
+  var collection = await db.collection(Db);
+  const command = db.command(Db);
   return Object.assign(
     {},
-    {dbCommand: exeCommand},
-    {getDistinct: commrun.getDistinct(exeCommand)},
-    {createIndex: commrun.createIndex(exeCommand)},
-    {dropIndex: commrun.dropIndex(exeCommand)},
-    {checkExists: commrun.checkExists(exeCommand)},
-    {insertIntoDb: commrun.insertIntoDb(exeCommand)},
-    {findFromDb: commrun.findFromDb(exeCommand)},
-    {closeConnect: db.closeConnect(settings.mgclient)},
-    {dbclient: settings.dbclient},
+    {command: command},
+    {getDistinct: commrun.getDistinct(command)},
+    {createIndex: commrun.createIndex(command)},
+    {dropIndex: commrun.dropIndex(command)},
+    {checkExists: commrun.checkExists(command)},
+    {insertIntoDb: commrun.insertIntoDb(command)},
+    {findFromDb: commrun.findFromDb(command)},
+    {closeConnect: db.closeConnect(mongoClient)},
+    {Db: Db},
   )
 }
 

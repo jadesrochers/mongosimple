@@ -87,7 +87,7 @@ describe('Inserts, Index, Find', () => {
   })
 
   test('Integration IndexCommand and createIndex, dbCommand', async () => {
-    var idxs = await dbconn.dbclient.collection('test').indexes()
+    var idxs = await dbconn.Db.collection('test').indexes()
     idxs = idxs.map(n => n.name)
     expect(idxs).toEqual(['_id_','afind','bfind'])
   })
@@ -95,7 +95,7 @@ describe('Inserts, Index, Find', () => {
   test('Integration dropIndexCommand and dropIndex, dbCommand', async () => {
     await dbconn.dropIndex('test')('afind')
     await dbconn.dropIndex('test')('bfind')
-    var idxs = await dbconn.dbclient.collection('test').indexes()
+    var idxs = await dbconn.Db.collection('test').indexes()
     idxs = idxs.map(n => n.name)
     expect(idxs).toEqual(['_id_'])
   })
