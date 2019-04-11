@@ -23,6 +23,7 @@ const mongoMaker = async function(inSettings){
     {deleteMany: commands.deleteMany(collection) },
     {createIndexes: commands.createIndexes(collection) },
     {dropIndex: commands.dropIndex(collection) },
+    {indexes: commands.indexes(collection) },
     {command: command},
     {Db: Db},
     {collection: collection},

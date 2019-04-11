@@ -33,14 +33,9 @@ describe('Set up and Tear down', () => {
 
 })
 
-describe('Inserts, Index, Find, Aggregate', () => {
+describe('Insert, Index, Find, Aggregate', () => {
   beforeAll(async () => {
     await setupMemDb()
-  });
-
-  beforeAll(async () => {
-    await dbconn.insertMany('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
-    await dbconn.insertMany('test')({_id: 3, d: 'singleinsert'})
     var aIndex = {
       key: {_id: 1, 'a':1 },
       name: 'afind'
@@ -52,20 +47,25 @@ describe('Inserts, Index, Find, Aggregate', () => {
     await dbconn.createIndexes('test')([aIndex, bIndex])
   })
 
-  test('Integration; getDistinct/distinctCommand', async () => {
+  beforeEach(async () => {
+    await dbconn.insertMany('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    await dbconn.insertMany('test')({_id: 3, d: 'singleinsert'})
+  })
+
+  afterEach(async () => {
+    await dbconn.deleteMany('test',{}) 
+  })
+
+  test('Test distinct command', async () => {
     var data = await dbconn.distinct('test', 'b')
     var dataarr = await data
     expect(dataarr).toEqual([2,4])
   })
 
-  test('Integration; command, insertCommand/insertIntoDb and findCommand/findFromDb', async () => {
+  test('Test insert, find commands', async () => {
     var cursor = await dbconn.find('test')({a: 1})
     var rsltarr = await cursor.toArray()
     expect(rsltarr).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
-
-    var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}})
-    var rsltarr = await cursor.toArray()
-    expect(rsltarr).toEqual([{_id:1, b: 2},{_id: 2, b: 4}])
 
     var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}, limit: 1})
     var rsltarr = await cursor.toArray()
@@ -79,18 +79,29 @@ describe('Inserts, Index, Find, Aggregate', () => {
     var rsltarr = await cursor.toArray()
     expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11},{_id: 1, a: 1, b: 2, c: 5}])
 
-    var cursor = await dbconn.find('test')({a: 1},{'skip':1})
-    var rsltarr = await cursor.toArray()
-    expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11}])
+  })
 
-    // Aggregate commands made a bit easier
-    var aggcursor = await dbconn.aggregate('test')([{$match: {a: 1}},{$limit:1}, {$project: {b:1}}])
+
+  test('Test deleteMany, find', async () => {
+    var rslt = await dbconn.deleteMany('test')({$or: [{b: 4}, {d: 'singleinsert'}] } )
+
+    var cursor = await dbconn.find('test')({})
+    var rsltarr = await cursor.toArray()
+    expect(rsltarr).toEqual([{_id: 1, a: 1, b: 2, c: 5}])
+
+  })
+
+  test('Test aggregate commands', async () => {
+    var aggcursor = await dbconn.aggregate('test')([
+     {$match: {a: 1}},
+     {$limit: 1},
+     {$project: {b:1}}])
     var rsltarr = await aggcursor.toArray()
     expect(rsltarr).toEqual([{_id: 1, b: 2}])
 
   })
 
-  test('Integration; insertCommand/insertIntoDb and checkExists/findCommand/hasData', async () => {
+  test('Test checkExists', async () => {
     var data = expect(await dbconn.checkExists('test')({c: 11})).toBe(true)
     var data = await dbconn.checkExists('test')({b: 2})
     expect(data).toBe(true)
@@ -98,16 +109,16 @@ describe('Inserts, Index, Find, Aggregate', () => {
     expect(data).toBe(false)
   })
 
-  test('Integration IndexCommand and createIndex, command', async () => {
-    var idxs = await dbconn.Db.collection('test').indexes()
+  test('Test createIndexes, indexes', async () => {
+    var idxs = await dbconn.indexes('test')
     idxs = idxs.map(n => n.name)
     expect(idxs).toEqual(['_id_','afind','bfind'])
   })
 
-  test('Integration dropIndexCommand and dropIndex, command', async () => {
+  test('Test dropIndex, indexes', async () => {
     await dbconn.dropIndex('test')('afind')
     await dbconn.dropIndex('test')('bfind')
-    var idxs = await dbconn.Db.collection('test').indexes()
+    var idxs = await dbconn.indexes('test')
     idxs = idxs.map(n => n.name)
     expect(idxs).toEqual(['_id_'])
   })
