@@ -20,6 +20,8 @@
         "test": "jest"
     },
     "devDependencies": {
+        "eslint": "^5.16.0",
+        "eslint-config-problems": "^2.0.0",
         "jest": "^24.5.0",
         "mongodb-memory-server": "^4.2.1"
     }
