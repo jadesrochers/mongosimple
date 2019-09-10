@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient
 const R = require('ramda')
 
 const mongoClient = R.curry(async(url, options={}) => {
-  var mgclient = await MongoClient.connect(url, { useNewUrlParser: true })
+  var mgclient = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   return mgclient
 })
 
