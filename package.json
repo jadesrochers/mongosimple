@@ -13,16 +13,16 @@
     "dependencies": {
         "@jadesrochers/checksettings": "^0.1.0",
         "@jadesrochers/fpstreamline": "^0.1.2",
-        "mongodb": "^3.1.13",
+        "mongodb": "^3.3.2",
         "ramda": "^0.26.1"
     },
     "scripts": {
         "test": "jest"
     },
     "devDependencies": {
-        "eslint": "^5.16.0",
-        "eslint-config-problems": "^2.0.0",
-        "jest": "^24.5.0",
-        "mongodb-memory-server": "^4.2.1"
+        "eslint": "^6.4.0",
+        "eslint-config-problems": "^3.0.1",
+        "jest": "^24.9.0",
+        "mongodb-memory-server": "^5.2.3"
     }
 }
