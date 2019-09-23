@@ -17,18 +17,24 @@ Get the connection to the db. Need to pass an object with a valid URL
 and database name.
 
 ### The commands available - 
-##### Get a database connection -  
+#### Get a database connection -  
 The settings must include url for mongodb and a database name.
+```javascript
 dbconn = await mongos.mongoMaker(settings);
-##### Insert data -  
+```
+#### Insert data -  
 There is only an insertMany command, but it works fine for single  
-inserts too.
+inserts too.  
+```javascript
 await dbconn.insertMany('testcoll')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
-##### Delete data -  
+```
+#### Delete data -  
 Also only deleteMany; it can delete nothing or everything depending  
-on the passed object.
+on the passed object.  
+```javascript
 await dbconn.deleteMany('testcoll',{}) 
-##### Insert an index -
+```
+#### Insert an index -
 Once again, it is createIndexes plural, but you can do a single  
 index as well.
 Pass the collection as first arg, then the index objects.
@@ -43,11 +49,13 @@ let bIndex = {
 }
 ```
 await dbconn.createIndexes('testcoll')([aIndex, bIndex])
-##### Delete an index -  
+#### Delete an index -  
 This is not a multi-command, have to delete one at a time.  
+```javascript
 await dbconn.dropIndex('test')('afind')
 await dbconn.dropIndex('test')('bfind')
-##### Find data -  
+```
+#### Find data -  
 Takes two objects, the search and then options. All the options  
 available in mongodb (projection, limit, min, max ...)  
 are available in the option object.
@@ -56,7 +64,7 @@ let cursor = await dbconn.find('testcoll')({a: 1})
 let cursor1 = await dbconn.find('testcoll')({a: 1},{'projection':{b: 1}, limit: 1})
 let cursor2 = await dbconn.find('testcoll')({a: 1},{'projection':{b: 1}, limit: 1, min: {_id:1, b:3}})
 ```
-#####  Use an aggregation pipeline -
+####  Use an aggregation pipeline -
 Pass the collection and the aggregation pipeline array.  
 ```javascript
 let aggcursor = await dbconn.aggregate('testcoll')([
@@ -67,7 +75,7 @@ let aggcursor = await dbconn.aggregate('testcoll')([
 ```
 
 
-#### Setting up a test db to run commands live -  
+## Setting up a test db to run commands live -  
 This uses a docker-compose to set up a database to demonstrate  
 how the library works.  
 **mongo-compose.yml:**  
