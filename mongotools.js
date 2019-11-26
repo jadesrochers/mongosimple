@@ -20,6 +20,7 @@ const mongoMaker = async function(inSettings){
     {aggregate: commands.aggregate(collection) },
     {distinct: commands.distinct(collection) },
     {insertMany: commands.insertMany(collection) },
+    {updateset: commands.updateset(collection) },
     {deleteMany: commands.deleteMany(collection) },
     {createIndexes: commands.createIndexes(collection) },
     {dropIndex: commands.dropIndex(collection) },

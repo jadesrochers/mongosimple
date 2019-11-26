@@ -30,10 +30,9 @@ describe('Set up and Tear down', () => {
     var rslt = await dbconn.find('test',{a: 1})
     expect(rslt.toArray()).rejects.toThrow(/Topology was destroyed/)
   })
-
 })
 
-describe('Insert, Index, Find, Aggregate', () => {
+describe('Insert, Index, Find, Update, Aggregate', () => {
   beforeAll(async () => {
     await setupMemDb()
     var aIndex = {
@@ -50,6 +49,7 @@ describe('Insert, Index, Find, Aggregate', () => {
   beforeEach(async () => {
     await dbconn.insertMany('test')([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
     await dbconn.insertMany('test')({_id: 3, d: 'singleinsert'})
+    await dbconn.updateset('test')({_id: 2}, {e: 100})
   })
 
   afterEach(async () => {
@@ -65,7 +65,7 @@ describe('Insert, Index, Find, Aggregate', () => {
   test('Test insert, find commands', async () => {
     var cursor = await dbconn.find('test')({a: 1})
     var rsltarr = await cursor.toArray()
-    expect(rsltarr).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11}])
+    expect(rsltarr).toEqual([{_id: 1, a: 1, b: 2, c: 5},{_id: 2, a: 1, b: 4, c: 11, e: 100}])
 
     var cursor = await dbconn.find('test')({a: 1},{'projection':{b: 1}, limit: 1})
     var rsltarr = await cursor.toArray()
@@ -77,7 +77,7 @@ describe('Insert, Index, Find, Aggregate', () => {
 
     var cursor = await dbconn.find('test')({a: 1},{'sort':{b: -1}})
     var rsltarr = await cursor.toArray()
-    expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11},{_id: 1, a: 1, b: 2, c: 5}])
+    expect(rsltarr).toEqual([{_id: 2, a: 1, b: 4, c: 11, e: 100},{_id: 1, a: 1, b: 2, c: 5}])
 
   })
 

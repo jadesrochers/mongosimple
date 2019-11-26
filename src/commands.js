@@ -42,6 +42,12 @@ const insertMany = R.curry(async (collection, collname, docs, insertoptions={}, 
  return rslt
 })
 
+const updateset = R.curry(async (collection, collname, query, modobj, insertoptions={}, colloptions={}) => {
+ let coll = await collection(collname, colloptions)
+ let rslt = await coll.update(query, {$set: modobj}, insertoptions)
+ return rslt
+})
+
 const deleteMany = R.curry(async (collection, collname, filter, deleteoptions={}, colloptions={}) => {
  let coll = await collection(collname, colloptions)
  let rslt = await coll.deleteMany(filter, deleteoptions)
@@ -73,6 +79,7 @@ exports.findOne = findOne
 exports.aggregate = aggregate
 exports.distinct = distinct
 exports.insertMany = insertMany
+exports.updateset = updateset
 exports.deleteMany = deleteMany
 exports.createIndexes = createIndexes
 exports.dropIndex = dropIndex
