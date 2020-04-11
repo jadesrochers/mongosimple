@@ -1,5 +1,5 @@
 var { MongoMemoryServer } = require('mongodb-memory-server')
-const mongotools = require('./mongotools')
+const mongotools = require('../mongotools')
 
 let dbconn, mongoServer;
 let settings = {};
@@ -28,7 +28,7 @@ describe('Set up and Tear down', () => {
     expect(dbconn.command).toBeDefined();
     await dbconn.closeConnect()
     var rslt = await dbconn.find('test',{a: 1})
-    expect(rslt.toArray()).rejects.toThrow(/Topology was destroyed/)
+    expect(rslt.toArray()).rejects.toThrow("Topology is closed, please connect")
   })
 })
 

@@ -42,9 +42,12 @@ const insertMany = R.curry(async (collection, collname, docs, insertoptions={}, 
  return rslt
 })
 
+// Select document based on the query, insert and collection options possible.
+// The modobj contains the data to be inserted into the document.
+// this will update as many documents as it finds (updateMany)
 const updateset = R.curry(async (collection, collname, query, modobj, insertoptions={}, colloptions={}) => {
  let coll = await collection(collname, colloptions)
- let rslt = await coll.update(query, {$set: modobj}, insertoptions)
+ let rslt = await coll.updateMany(query, {$set: modobj}, insertoptions)
  return rslt
 })
 

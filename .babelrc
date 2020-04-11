@@ -1,0 +1,36 @@
+{
+  "env" : {
+    "test" : {
+      "presets": [ 
+        [ "@babel/preset-env", 
+      {
+        "targets": {
+          "node": 8
+        }
+      }]
+      ],
+    },
+      "es6" : {
+        "presets": [ 
+          [ "@babel/preset-env", 
+        {
+          "targets": {
+            "esmodules": true
+          },
+modules: false,
+        }],
+        ],
+      },
+      "cjs" : {
+        "presets": [ 
+          [ "@babel/preset-env", 
+        {
+          "targets": {
+            "node": 8
+          }
+        }]
+        ],
+      }
+  }
+}
+

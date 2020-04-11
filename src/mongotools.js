@@ -1,7 +1,7 @@
 const R = require('ramda')
 const checkset = require('@jadesrochers/checksettings')
-const db = require('./src/dbhandlers')
-const commands = require('./src/commands')
+const db = require('./dbhandlers')
+const commands = require('./commands')
 
 const settings_required = ["urldb","database"]
 const mongoMaker = async function(inSettings){
