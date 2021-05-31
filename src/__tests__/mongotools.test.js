@@ -14,6 +14,7 @@ async function teardownMemDb(){
   if (dbconn) dbconn.closeConnect();
   if (mongoServer) mongoServer.stop();
 }
+jest.setTimeout(90*1000);
 
 describe('Set up and Tear down', () => {
   beforeEach(async () => {
